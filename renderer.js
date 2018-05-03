@@ -55,9 +55,28 @@ var Image = {
     }
 };
 
+var Video = {
+    view: function(vnode) {
+        var src = vnode.attrs.src;
+
+        return m("video", {
+            autoplay: true,
+            oncreate: function(vnode){
+                vnode.dom.play();
+            }
+        }, [
+            m("source", {
+                type: "video/webm",
+                src: src
+            })
+        ]);
+    }
+};
+
 var typeMap = {
     "camera": Camera,
-    "image": Image
+    "image": Image,
+    "video": Video
 };
 
 
@@ -108,13 +127,24 @@ var Filelist = function(){
             return m(".files", files.map((e)=>{
                 return m(".file", {
                     onclick: function(){
-                        Elements.push({
-                            type: "image",
-                            pos: [0,0],
-                            scale: 1,
-                            id: idCount++,
-                            src: "./resources/"+e
-                        });
+                        if(e.split(".")[1]==="mkv"){
+                            Elements.push({
+                                type: "video",
+                                pos: [0,0],
+                                scale: 1,
+                                id: idCount++,
+                                src: "./resources/"+e
+                            });
+                        } else {
+                            Elements.push({
+                                type: "image",
+                                pos: [0,0],
+                                scale: 1,
+                                id: idCount++,
+                                src: "./resources/"+e
+                            });
+                        }
+
                     }
                 },e);
             }));
