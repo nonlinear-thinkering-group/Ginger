@@ -12,8 +12,9 @@ document.addEventListener("keypress", function(e){
             scale: 1,
             id: idCount++
         });
-        m.redraw();
     }
+
+    m.redraw();
 }, false);
 
 
@@ -44,11 +45,20 @@ var Camera = {
     }
 };
 
-var typeMap = {
-    "camera": Camera
+var Image = {
+    view: function(vnode) {
+        var src = vnode.attrs.src;
+
+        return m("img", {
+            src: src
+        });
+    }
 };
 
-
+var typeMap = {
+    "camera": Camera,
+    "image": Image
+};
 
 
 
@@ -63,6 +73,7 @@ var Block = function(){
             return m(".block", {
                 style: "left: "+block.pos[0]+ "px; top: "+block.pos[1]+"px; transform: scale("+block.scale+");",
                 onmousedown: function(e){
+                    e.preventDefault();
                     offset = [block.pos[0] - e.clientX, block.pos[1] - e.clientY];
                     draghandler(function(e){
                         block.pos = [offset[0] + e.clientX, offset[1] + e.clientY];
@@ -85,12 +96,41 @@ var Block = function(){
     };
 };
 
+var Filelist = function(){
+    var files = [];
+    fs.readdir("./resources/", (err, f) => {
+        files = f;
+        m.redraw();
+    });
+
+    return {
+        view: function(vnode) {
+            return m(".files", files.map((e)=>{
+                return m(".file", {
+                    onclick: function(){
+                        Elements.push({
+                            type: "image",
+                            pos: [0,0],
+                            scale: 1,
+                            id: idCount++,
+                            src: "./resources/"+e
+                        });
+                    }
+                },e);
+            }));
+        }
+    };
+};
+
 var Canvas = function(){
     return {
         view: function(vnode) {
-            return m(".canvas", Elements.map((e)=>{
-                return m(Block, e);
-            }));
+            return [
+                m(Filelist),
+                m(".canvas", Elements.map((e)=>{
+                    return m(Block, e);
+                }))
+            ];
 
         }
     };

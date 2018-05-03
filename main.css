@@ -5,4 +5,5 @@ body {
 
 .block {
     position: absolute;
+    mix-blend-mode: multiply;
 }
